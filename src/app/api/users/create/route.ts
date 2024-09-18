@@ -1,7 +1,6 @@
 "use server";
 
 import { MongoClient } from "mongodb";
-// Start of Selection
 
 const uri = process.env.MONGODB_URI;
 if (!uri) {
@@ -22,8 +21,14 @@ export async function POST(request: Request) {
 
   try {
     await client.connect();
-    const database = client.db("your-database-name");
+    const database = client.db("Storypalzzz");
     const users = database.collection("users");
+
+    // Check if the user already exists
+    const existingUser = await users.findOne({ email, userId });
+    if (existingUser) {
+      return Response.json({ error: "User already exists" }, { status: 409 });
+    }
 
     const newUser = { email, userId, createdAt: new Date() };
     const result = await users.insertOne(newUser);
